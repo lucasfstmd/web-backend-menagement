@@ -1,0 +1,2636 @@
+openapi: 3.0.0
+info:
+  version: v1
+  title: Data Cross
+  description: Documentation for the data crossover service - Data Cross
+
+servers:
+  - description: Localhost
+    url: https://localhost:3001/v1
+
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/SMTC3/data-cross/v1
+
+tags:
+  - name: Scanc Header
+    description: 'Endpoints to manipulate SCANC headers'
+
+  - name: Scanc Annex II
+    description: 'Endpoints to manipulate SCANC Annex II'
+
+  - name: Scanc Annex IV
+    description: 'Endpoints to manipulate SCANC Annex IV'
+
+  - name: Scanc PMPF
+    description: 'Endpoints to manipulate SCANC PMPF'
+
+  - name: Scanc Aliquot
+    description: 'Endpoints to manipulate SCANC Aliquot'
+
+  - name: Scanc Product
+    description: 'Endpoints to manipulate SCANC Products'
+
+  - name: Crossed Data
+    description: 'Result of data crossed between attachments and invoices for a given month'
+
+
+paths:
+
+  /scanc/companies:
+    get:
+      tags:
+        - Scanc Companies
+      summary: 'Retrieve the list of companies'
+      operationId: getAllCompanies
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Companies list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/companies/{cnpj}:
+    get:
+      tags:
+        - Scanc Companies
+      summary: 'Retrieve the company by cnpj'
+      operationId: getCompanyByCnpj
+      parameters:
+        - name: cnpj
+          in: path
+          required: true
+          description: Month and year.
+          example: '41080722000180'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Companies list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/companies/{cnpj}/annualsummary/{year}:
+    get:
+      tags:
+        - Scanc Companies
+      summary: 'Retrieve the annual summary'
+      operationId: getAnnualSummary
+      parameters:
+        - name: cnpj
+          in: path
+          required: true
+          description: Month and year.
+          example: '41080722000180'
+          schema:
+            type: string
+        - name: year
+          in: path
+          required: true
+          description: Month and year.
+          example: '41080722000180'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annual summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnnualSummary'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/companies/{cnpj}/monthlysummary/{month_year}/{fuel}:
+    get:
+      tags:
+        - Scanc Companies
+      summary: 'Retrieve the monthly summary'
+      operationId: getMonthlySummary
+      parameters:
+        - name: cnpj
+          in: path
+          required: true
+          description: Month and year.
+          example: '41080722000180'
+          schema:
+            type: string
+        - name: month_year
+          in: path
+          required: true
+          description: Month and year.
+          example: '012021'
+          schema:
+            type: string
+        - name: fuel
+          in: path
+          required: true
+          description: 'Type of fuel'
+          schema:
+            type: string
+            enum: ["AEA","BOO", "DSL", "DSM", "GLP","GPN", "GSL", "GSP", "GSV", "OCB", "P13", "QAV", "QRS", "S10"]
+      responses:
+        200:
+          description: Monthly summary.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MonthlySummaryItem'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/header:
+    post:
+      tags:
+        - Scanc Header
+      summary: 'Register a new annex header.'
+      operationId: addAnnexHeader
+      requestBody:
+        required: true
+        description: List of annexes to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Header'
+      responses:
+        207:
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Header
+      summary: 'Retrieve the list of annex header'
+      operationId: getAnnexHeaders
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Header'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+  /scanc/header/{header_id}:
+    get:
+      tags:
+        - Scanc Header
+      summary: 'Retrieve the annex summary'
+      operationId: getAnnexHeaderSummaryById
+      parameters:
+        - name: header_id
+          in: path
+          required: true
+          description: Identifier of annex header.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Header'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a2q2d:
+    post:
+      tags:
+        - Scanc Annex II
+      summary: 'Registration of a new type II annex.'
+      operationId: addAnnexIIData
+      requestBody:
+        required: true
+        description: List of annexes to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/A2q2d'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Annex II
+      summary: 'Retrieve the list of annexies'
+      operationId: getAnnexIIData
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/A2q2d'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a2q2d/{a2q2d_id}:
+    get:
+      tags:
+        - Scanc Annex II
+      summary: 'Retrieve the annex by identifier'
+      operationId: getAnnexIIDataById
+      parameters:
+        - name: a2q2d_id
+          in: path
+          required: true
+          description: Identifier of annex.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annex II data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/A2q2d'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a2q2h:
+    post:
+      tags:
+        - Scanc Annex II
+      summary: 'Registration of a new type II annex.'
+      operationId: addAnnexIIHeader
+      requestBody:
+        required: true
+        description: List of annexes to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/A2q2h'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Annex II
+      summary: 'Retrieve the list of annexies'
+      operationId: getAnnexIIHeader
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/A2q2h'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a2q2h/{a2q2h_id}:
+    get:
+      tags:
+        - Scanc Annex II
+      summary: 'Retrieve the annex by identifier'
+      operationId: getAnnexIIHeaderById
+      parameters:
+        - name: a2q2h_id
+          in: path
+          required: true
+          description: Identifier of annex.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annex II header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/A2q2h'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a4q2d:
+    post:
+      tags:
+        - Scanc Annex IV
+      summary: 'Registration of a new type IV annex.'
+      operationId: addAnnexIVData
+      requestBody:
+        required: true
+        description: List of annexes to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/A4q2d'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Annex IV
+      summary: 'Retrieve the list of annexies'
+      operationId: getAnnexIVData
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/A4q2d'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a4q2d/{a4q2d_id}:
+    get:
+      tags:
+        - Scanc Annex IV
+      summary: 'Retrieve the annex by identifier'
+      operationId: getAnnexIVDataById
+      parameters:
+        - name: a4q2d_id
+          in: path
+          required: true
+          description: Identifier of annex.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annex II data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/A4q2d'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a4q2h:
+    post:
+      tags:
+        - Scanc Annex IV
+      summary: 'Registration of a new type IV annex.'
+      operationId: addAnnexIVHeader
+      requestBody:
+        required: true
+        description: List of annexes to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/A4q2h'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Annex IV
+      summary: 'Retrieve the list of annexies'
+      operationId: getAnnexIVHeader
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/A4q2h'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/a4q2h/{a4q2h_id}:
+    get:
+      tags:
+        - Scanc Annex IV
+      summary: 'Retrieve the annex by identifier'
+      operationId: getAnnexIVHeaderById
+      parameters:
+        - name: a4q2h_id
+          in: path
+          required: true
+          description: Identifier of annex.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Annex II header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/A4q2h'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/pmpf:
+    post:
+      tags:
+        - Scanc PMPF
+      summary: 'Registration of a new pmpf.'
+      operationId: addPmpf
+      requestBody:
+        required: true
+        description: List of records to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Pmpf'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc PMPF
+      summary: 'Retrieve the list of pmpfs'
+      operationId: getAllPmpf
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Pmpf list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pmpf'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/pmpf/{pmpf_id}:
+    get:
+      tags:
+        - Scanc PMPF
+      summary: 'Retrieve the pmpfs by identifier'
+      operationId: getPmpfById
+      parameters:
+        - name: pmpf_id
+          in: path
+          required: true
+          description: Identifier of Pmpf.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Pmpf selected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pmpf'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /crossed_annex_nfe/{annex_type}/{month_year}:
+    get:
+      tags:
+        - Crossed Data
+      summary: 'Retrieve the summary of an annex type for a given month.'
+      operationId: getAnnexSummary
+      parameters:
+        - name: annex_type
+          in: path
+          required: true
+          description: 'Annex type identifier'
+          schema:
+            type: string
+            enum: ['2','4']
+        - name: month_year
+          in: path
+          required: true
+          description: Month and year identifier.
+          schema:
+            type: string
+          example: '012021'
+      responses:
+        200:
+          description: Annex summary list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CrossedAnnexNfe'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/aliquot:
+    post:
+      tags:
+        - Scanc Aliquot
+      summary: 'Registration of a new aliquot.'
+      operationId: addAliquot
+      requestBody:
+        required: true
+        description: List of records to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Aliquot'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Aliquot
+      summary: 'Retrieve the list of aliquot'
+      operationId: getAllAliquot
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Aliquot list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aliquot'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/aliquot/{aliquot_id}:
+    get:
+      tags:
+        - Scanc Aliquot
+      summary: 'Retrieve the aliquot by identifier'
+      operationId: getAliquotById
+      parameters:
+        - name: aliquot_id
+          in: path
+          required: true
+          description: Identifier of Aliquot.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aliquot selected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aliquot'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/product:
+    post:
+      tags:
+        - Scanc Product
+      summary: 'Registration of a new product.'
+      operationId: addProductSef
+      requestBody:
+        required: true
+        description: List of records to be inserted.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+      responses:
+        '207':
+          description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiStatus'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - Scanc Product
+      summary: 'Retrieve the list of products'
+      operationId: getAllPrSef
+      parameters:
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/filterParam'
+      responses:
+        200:
+          description: Product list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+  /scanc/product/{product_id}:
+    get:
+      tags:
+        - Scanc Product
+      summary: 'Retrieve the product by identifier'
+      operationId: getPrSefById
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: Identifier of product.
+          example: ''
+          schema:
+            type: string
+      responses:
+        200:
+          description: Product selected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        409:
+          $ref: '#/components/responses/409'
+        500:
+          $ref: '#/components/responses/500'
+
+          # /atf/nfe:
+          #   post:
+          #     tags:
+          #       - Electronic Invoices
+          #     summary: ''
+          #     operationId: addNfes
+          #     requestBody:
+          #       required: true
+          #       description: List of nfe to be inserted.
+          #       content:
+          #         application/json:
+          #           schema:
+          #             type: array
+          #             items:
+          #               $ref: '#/components/schemas/Nfe'
+          #     responses:
+          #       '207':
+          #         description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+          #         content:
+          #           application/json:
+          #             schema:
+          #               $ref: '#/components/schemas/MultiStatus'
+          #       400:
+          #         $ref: '#/components/responses/400'
+          #       401:
+          #         $ref: '#/components/responses/401'
+          #       403:
+          #         $ref: '#/components/responses/403'
+          #       409:
+          #         $ref: '#/components/responses/409'
+          #       500:
+          #         $ref: '#/components/responses/500'
+
+    # /atf/giast:
+    #   post:
+    #     tags:
+    #       - Electronic Invoices
+    #     summary: ''
+    #     operationId: addGiast
+    #     requestBody:
+    #       required: true
+    #       description: List of nfe to be inserted.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               $ref: '#/components/schemas/Nfe'
+    #     responses:
+    #       '207':
+    #         description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+    #         content:
+    #           application/json:
+    #             schema:
+    #               $ref: '#/components/schemas/MultiStatus'
+    #       400:
+    #         $ref: '#/components/responses/400'
+    #       401:
+    #         $ref: '#/components/responses/401'
+    #       403:
+    #         $ref: '#/components/responses/403'
+    #       409:
+    #         $ref: '#/components/responses/409'
+    #       500:
+    #         $ref: '#/components/responses/500'
+
+    # /atf/gnre:
+    #   post:
+    #     tags:
+    #       - Electronic Invoices
+    #     summary: ''
+    #     operationId: addGnres
+    #     requestBody:
+    #       required: true
+    #       description: List of nfe to be inserted.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               $ref: '#/components/schemas/Nfe'
+    #     responses:
+    #       '207':
+    #         description: Successful request, however, can have several status codes for the case of a list of submitted resources.
+    #         content:
+    #           application/json:
+    #             schema:
+    #               $ref: '#/components/schemas/MultiStatus'
+    #       400:
+    #         $ref: '#/components/responses/400'
+    #       401:
+    #         $ref: '#/components/responses/401'
+    #       403:
+    #         $ref: '#/components/responses/403'
+    #       409:
+    #         $ref: '#/components/responses/409'
+    #       500:
+    #         $ref: '#/components/responses/500'
+
+components:
+
+  schemas:
+
+    Aliquot:
+      type: object
+      description: 'Data model used in the Aliquot.
+      (Refers to SCANC GST table TBALIQUOTA)'
+      required:
+        - standard
+        - num
+        - year
+        - state
+        - start_date
+        - end_date
+        - product
+        - value
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        standard:
+          type: string
+          maxLength: 10
+          description: 'Legislative norm that amends the aliquot'
+          example: 'ATO COTEPE'
+        num:
+          type: string
+          maxLength: 5
+          description: 'Number of the legislative norm that changes the aliquot'
+          example: '8'
+        year:
+          type: string
+          maxLength: 4
+          description: 'Year of publication of the standard'
+          example: '2021'
+        state:
+          type: string
+          maxLength: 2
+          description: 'Identification of the UF (state) in which the standard is in force'
+          example: 'PB'
+        start_date:
+          type: string
+          format: date-time
+          description: 'Standard effective date'
+          example: '2021-01-01'
+        end_date:
+          type: string
+          format: date-time
+          description: 'Standard end of validity date'
+          example: '2021-01-31'
+        product:
+          type: string
+          maxLength: 5
+          description: 'Product Identification'
+          enum: ["AEA","BOO", "DSL", "DSM", "GLP","GPN", "GSL", "GSP", "GSV", "OCB", "P13", "QAV", "QRS", "S10"]
+          example: 'GSL'
+        value:
+          type: number
+          description: 'Aliquot value'
+          example: 27
+
+    AnnualSummary:
+      type: object
+      description: 'Data model used in the annual summary resulting from annexes'
+      properties:
+        gsl:
+          type: array
+          description: 'List with elements for the 12 months of the year'
+          items:
+            $ref: '#/components/schemas/AnnualSummaryItem'
+        s10:
+          type: array
+          description: 'List with elements for the 12 months of the year'
+          items:
+            $ref: '#/components/schemas/AnnualSummaryItem'
+        s500:
+          type: array
+          description: 'List with elements for the 12 months of the year'
+          items:
+            $ref: '#/components/schemas/AnnualSummaryItem'
+        and:
+          type: array
+          description: 'List with elements for the 12 months of the year'
+          items:
+            $ref: '#/components/schemas/AnnualSummaryItem'
+        icms_complement:
+          type: array
+          description: 'List with elements for the 12 months of the year'
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+                example: '012021'
+              value:
+                type: number
+                example: 125747.23
+
+    AnnualSummaryItem:
+      type: object
+      description: 'Data model used in the annual summary item resulting from annexes'
+      properties:
+        date:
+          type: string
+          format: date
+          description: 'Date'
+          example: '012021'
+        amount:
+          type: number
+          description: 'Amount'
+          example: 1310000
+        icms:
+          type: number
+          description: 'ICMS value'
+          example: 982098.59
+
+    A2q2d:
+      type: object
+      description: 'Data model used by type II annexes.
+      (Refers to SCANC UF table TBA2Q2D)'
+      required:
+        - cnpj_issuer
+        - ie_issuer
+        - state_issuer
+        - month_year
+        - identifier
+        - cnpj
+        - ie
+        - state
+        - issue_date
+        - model
+        - serie
+        - nfe_number
+        - cfop
+        - nfe_product
+        - product
+        - amount
+        - amount_consumer_product
+        - startting_value
+        - bcst_value
+        - icms_rate
+        - icms_st_value
+        - shipping_type
+        - cnpj_freight
+        - state_freight
+        - plate_1
+        - plate_2
+        - plate_3
+        - destination
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        cnpj_issuer:
+          type: string
+          maxLength: 14
+          description: 'CNPJ of the company of origin.'
+          example: '26090286000137'
+        ie_issuer:
+          type: string
+          maxLength: 14
+          description: 'State registration of the company of origin.'
+          example: '016122778'
+        state_issuer:
+          type: string
+          maxLength: 2
+          description: 'State of the company of origin.'
+          example: 'PB'
+        month_year:
+          type: string
+          maxLength: 6
+          description: 'Identifier of the month and year of registration.'
+          example: '012021'
+        identifier:
+          type: string
+          maxLength: 3
+          description: 'Identifier of registration (ID).'
+          example: '006'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the recipient company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'State registration of the recipient company.'
+          example: '016122778'
+        state:
+          type: string
+          maxLength: 2
+          description: 'State of the recipient company.'
+          example: 'PB'
+        issue_date:
+          type: string
+          format: date-time
+          description: 'Annex issue date.'
+          example: '2021-01-18T03:00:00.000Z'
+        model:
+          type: string
+          maxLength: 2
+          description: 'Invoice template used.'
+          example: '55'
+        serie:
+          type: string
+          maxLength: 3
+          description: 'Invoice serie'
+          example: '3'
+        nfe_number:
+          type: string
+          maxLength: 9
+          description: 'Invoice identifier number'
+          example: '000113265'
+        cfop:
+          type: string
+          maxLength: 4
+          description: 'Tax code of operations and services.'
+          example: '6659'
+        nfe_product:
+          type: string
+          maxLength: 5
+          description: ''
+          example: '64301'
+        product:
+          type: string
+          maxLength: 3
+          enum: ["DSL", "DSM", "GLP", "GSL", "GSP", "OCB", "S10"]
+          description: 'Type of fuel'
+          example: 'S10'
+        amount:
+          type: number
+          description: 'Amount of fuel'
+          example: 45614
+        amount_consumer_product:
+          type: number
+          description: 'Quantity of product consumed'
+          example: 45614
+        startting_value:
+          type: number
+          description: 'PMPF value of the product destination'
+          example: 36913
+        bcst_value:
+          type: number
+          description: 'Tax substitution calculation basis'
+          example: 191335.18
+        icms_rate:
+          type: number
+          description: 'Internal rate of product destination'
+          example: 18
+        icms_st_value:
+          type: number
+          description: 'ICMS due to the UF of destination of the product'
+          example: 34440.33
+        shipping_type:
+          type: string
+          maxLength: 1
+          description: 'Type of shipping'
+          example: '2'
+        cnpj_freight:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the carrier indicated on the invoice'
+          example: '26090286000137'
+        state_freight:
+          type: string
+          maxLength: 14
+          description: 'UF of the carrier indicated on the invoice'
+          example: 'PE'
+        plate_1:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+        plate_2:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+        plate_3:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+        destination:
+          type: string
+          maxLength: 1
+          description: 'CFOP description of the invoice'
+          example: '2'
+
+    A2q2h:
+      type: object
+      description: 'Data model used by type II annexes.
+      (Refers to SCANC UF table TBA2Q2H)'
+      required:
+        - cnpj_issuer
+        - ie_issuer
+        - state_issuer
+        - month_year
+        - identifier
+        - cnpj
+        - ie
+        - iest
+        - corporate_name
+        - address
+        - district
+        - county
+        - state
+        - zip_code
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        cnpj_issuer:
+          type: string
+          maxLength: 14
+          description: 'CNPJ of the company of origin.'
+          example: '26090286000137'
+        ie_issuer:
+          type: string
+          maxLength: 14
+          description: 'State registration of the company of origin.'
+          example: '016122778'
+        state_issuer:
+          type: string
+          maxLength: 2
+          description: 'State of the company of origin.'
+          example: 'PB'
+        month_year:
+          type: string
+          maxLength: 6
+          description: 'Identifier of the month and year of registration.'
+          example: '012021'
+        identifier:
+          type: string
+          maxLength: 3
+          description: 'Identifier of registration.'
+          example: '006'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the recipient company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'State registration of the recipient company.'
+          example: '016122778'
+        iest:
+          type: string
+          maxLength: 14
+          description: 'IEST of the recipient company.'
+          example: '016122778'
+        corporate_name:
+          type: string
+          maxLength: 60
+          description: 'Business name of the recipient of the transaction.'
+          example: 'Distribuidora de Combustíveis S/A'
+        address:
+          type: string
+          maxLength: 14
+          description: 'Address of the recipient of the transaction.'
+          example: 'Rua do Comercio SN'
+        district:
+          type: string
+          maxLength: 14
+          description: 'Neighborhood of the recipient of the operation.'
+          example: 'Centro'
+        county:
+          type: string
+          maxLength: 14
+          description: 'Municipality of the recipient of the operation.'
+          example: 'Campina Grande'
+        state:
+          type: string
+          maxLength: 2
+          description: 'State of the recipient of the transaction'
+          example: 'PB'
+        zip_code:
+          type: string
+          maxLength: 14
+          description: 'Zip code of the recipient of the transaction.'
+          example: '58414040'
+
+    A4q2d:
+      type: object
+      description: 'Data model used by type IV annexes.
+      (Refers to SCANC UF table TBA4Q2D)'
+      required:
+        - cnpj_issuer
+        - ie_issuer
+        - state_issuer
+        - month_year
+        - identifier
+        - cnpj
+        - ie
+        - state
+        - issue_date
+        - model
+        - serie
+        - nfe_number
+        - cfop
+        - amount
+        - unitary_value
+        - operation_value
+        - bcst_value
+        - icms_rate
+        - icms_st_value
+        - shipping_type
+        - cnpj_freight
+        - state_freight
+        - plate_1
+        - plate_2
+        - plate_3
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        cnpj_issuer:
+          type: string
+          maxLength: 14
+          description: 'CNPJ of the company of origin.'
+          example: '26090286000137'
+        ie_issuer:
+          type: string
+          maxLength: 14
+          description: 'State registration of the company of origin.'
+          example: '016122778'
+        state_issuer:
+          type: string
+          maxLength: 2
+          description: 'State of the company of origin.'
+          example: 'PB'
+        month_year:
+          type: string
+          maxLength: 6
+          description: 'Identifier of the month and year of registration.'
+          example: '012021'
+        identifier:
+          type: string
+          maxLength: 3
+          description: 'Identifier of registration.'
+          example: '006'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the recipient company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'State registration of the recipient company.'
+          example: '016122778'
+        state:
+          type: string
+          maxLength: 2
+          description: 'State of the recipient company.'
+          example: 'PB'
+        issue_date:
+          type: string
+          format: date-time
+          description: 'Annex issue date.'
+          example: '2021-01-18T03:00:00.000Z'
+        model:
+          type: string
+          maxLength: 2
+          description: 'Invoice template used.'
+          example: '55'
+        serie:
+          type: string
+          maxLength: 3
+          description: 'Invoice serie'
+          example: '3'
+        nfe_number:
+          type: string
+          maxLength: 9
+          description: 'Invoice identifier number'
+          example: '000113265'
+        cfop:
+          type: string
+          maxLength: 4
+          description: 'Tax code of operations and services.'
+          example: '6659'
+        amount:
+          type: number
+          description: 'Amount of fuel'
+          example: 45614
+        unitary_value:
+          type: number
+          description: 'Unitary value'
+          example: 28634
+        operation_value:
+          type: number
+          description: 'Transaction value'
+          example: 130440.09
+        bcst_value:
+          type: number
+          description: 'Tax substitution calculation basis'
+          example: 191335.18
+        icms_rate:
+          type: number
+          description: 'Internal rate of product destination'
+          example: 18
+        icms_st_value:
+          type: number
+          description: 'ICMS due to the UF of destination of the product'
+          example: 34440.33
+        shipping_type:
+          type: string
+          maxLength: 1
+          description: 'Type of shipping'
+          example: '2'
+        cnpj_freight:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the carrier indicated on the invoice'
+          example: '26090286000137'
+        state_freight:
+          type: string
+          maxLength: 14
+          description: 'UF of the carrier indicated on the invoice'
+          example: 'PE'
+        plate_1:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+        plate_2:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+        plate_3:
+          type: string
+          maxLength: 7
+          description: 'License plate of the vehicle used to transport the product'
+          example: 'ABC1111'
+
+    A4q2h:
+      type: object
+      description: 'Data model used by type IV annexes.
+      (Refers to SCANC UF table TBA4Q2H)'
+      required:
+        - cnpj_issuer
+        - ie_issuer
+        - state_issuer
+        - month_year
+        - identifier
+        - cnpj
+        - ie
+        - corporate_name
+        - address
+        - district
+        - county
+        - state
+        - zip_code
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        cnpj_issuer:
+          type: string
+          maxLength: 14
+          description: 'CNPJ of the company of origin.'
+          example: '26090286000137'
+        ie_issuer:
+          type: string
+          maxLength: 14
+          description: 'State registration of the company of origin.'
+          example: '016122778'
+        state_issuer:
+          type: string
+          maxLength: 2
+          description: 'State of the company of origin.'
+          example: 'PB'
+        month_year:
+          type: string
+          maxLength: 6
+          description: 'Identifier of the month and year of registration.'
+          example: '012021'
+        identifier:
+          type: string
+          maxLength: 3
+          description: 'Identifier of registration (ID).'
+          example: '006'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the recipient company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'State registration of the recipient company.'
+          example: '016122778'
+        corporate_name:
+          type: string
+          maxLength: 60
+          description: 'Business name of the recipient of the transaction.'
+          example: 'Distribuidora de Combustíveis S/A'
+        address:
+          type: string
+          maxLength: 60
+          description: 'Address of the recipient of the transaction.'
+          example: 'Rua do Comercio SN'
+        district:
+          type: string
+          maxLength: 30
+          description: 'Neighborhood of the recipient of the operation.'
+          example: 'Centro'
+        county:
+          type: string
+          maxLength: 40
+          description: 'Municipality of the recipient of the operation.'
+          example: 'Campina Grande'
+        state:
+          type: string
+          maxLength: 2
+          description: 'State of the recipient of the transaction'
+          example: 'PB'
+        zip_code:
+          type: string
+          maxLength: 14
+          description: 'Zip code of the recipient of the transaction.'
+          example: '58414040'
+
+    CrossedAnnexNfe:
+      type: object
+      description: 'Data model used in the annual summary item resulting from annexes'
+      properties:
+        corporate_name:
+          type: string
+          format: date
+          description: 'Issuer corporate name'
+          example: '012021'
+        cnpj:
+          type: string
+          description: 'Issuer CNPJ'
+          example: '40108722000180'
+        state:
+          type: string
+          description: 'Issuer state'
+          example: 'PB'
+        product:
+          type: string
+          maxLength: 3
+          enum: ["AEA","B00","DSL", "DSM","GLN","GLP","GPN", "GSL", "GSP", "OCB", "QAV", "S10"]
+          description: 'Type of fuel'
+          example: 'S10'
+        nfe:
+          type: object
+          description: 'Result of SCANC'
+          properties:
+            amount:
+              type: number
+              description: 'Amount of fuel'
+              example: 10000
+            icms_st:
+              type: number
+              description: 'Value of ICMS ST'
+              example: 7115.40
+        scanc:
+          type: object
+          description: 'Result of NF-e'
+          properties:
+            amount:
+              type: number
+              description: 'Amount of fuel'
+              example: 10000
+            icms_st:
+              type: number
+              description: 'Value of ICMS ST'
+              example: 7115
+        diff:
+          type: object
+          description: 'Difference between SCANC and NF-e data'
+          properties:
+            amount:
+              type: number
+              description: 'Amount of fuel'
+              example: 0
+            icms_st:
+              type: number
+              description: 'Value of ICMS ST'
+              example: 0.40
+
+    Company:
+      type: object
+      description: 'Data model used in the summary resulting from annexes'
+      properties:
+        corporate_name:
+          type: string
+          maxLength: 14
+          description: 'Corporate name of the issuing company.'
+          example: 'Distribuidora de Combustíveis S/A.'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'CNPJ of the issuing company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'Supplier state registration.'
+          example: '016122778'
+        address:
+          type: string
+          maxLength: 60
+          description: 'Address of the recipient of the transaction.'
+          example: 'Rua do Comercio SN'
+        district:
+          type: string
+          maxLength: 30
+          description: 'Neighborhood of the recipient of the operation.'
+          example: 'Centro'
+        county:
+          type: string
+          maxLength: 40
+          description: 'Municipality of the recipient of the operation.'
+          example: 'Campina Grande'
+        state:
+          type: string
+          readOnly: true
+          maxLength: 2
+          description: 'State of the recipient of the transaction'
+          example: 'PB'
+        zip_code:
+          type: string
+          maxLength: 14
+          description: 'Zip code of the recipient of the transaction.'
+          example: '58414040'
+        email:
+          type: string
+          maxLength: 60
+          description: 'Responsible contact email'
+          example: 'contact@mail.com'
+        category:
+          type: string
+          maxLength: 3
+          description: 'Issuer category'
+          enum: ['DIS','IMP','REF','TRR']
+          example: 'DIS'
+        phone:
+          type: string
+          maxLength: 12
+          description: 'Responsible contact phone number'
+          example: '01131776355'
+        contact:
+          type: string
+          maxLength: 40
+          description: 'Name of responsible'
+          example: 'João Alberto'
+        contact_position:
+          type: string
+          maxLength: 40
+          description: 'Responsible position'
+          example: 'DIRETOR ADMINISTRATIVO'
+        contact_cpf:
+          type: string
+          maxLength: 11
+          description: 'CPF of the responsible'
+          example: '92760472043'
+        contact_rg:
+          type: string
+          maxLength: 14
+          description: 'RG of the responsible'
+          example: '479615809'
+        contact_state:
+          type: string
+          readOnly: true
+          maxLength: 2
+          description: 'State of RG of the responsible'
+          example: 'PB'
+
+    Error:
+      type: object
+      description: >-
+        Default template for error message. All returned errors will followthis template.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: >-
+            Unique API code that indicates specific details of the error, or
+            the actual status code of the response when the unique code is not
+            appropriate.
+        message:
+          type: string
+          description: Readable and short description of the error.
+        description:
+          type: string
+          description: Detailed description of the error.
+
+    Header:
+      type: object
+      description: 'Data model used by type Tbheader.
+      (Refers to SCANC UF table TBHEADER)'
+      required:
+        - month_year
+        - identifier
+        - annex
+        - product
+        - origin_state
+        - cnpj_supplier
+        - ie_supplier
+        - destination_state
+        - others_state
+        - cnpj
+        - ie
+        - iest
+        - corporate_name
+        - address
+        - district
+        - county
+        - state
+        - zip_code
+        - email
+        - category
+        - phone
+        - contact
+        - contact_position
+        - contact_cpf
+        - contact_rg
+        - contact_state
+        - local
+        - date
+        - hour
+        - annex_origin
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        month_year:
+          type: string
+          maxLength: 6
+          description: 'Identifier of the month and year of registration.'
+          example: '012021'
+        identifier:
+          type: string
+          maxLength: 3
+          description: 'Identifier of registration (ID).'
+          example: '006'
+        annex:
+          type: string
+          maxLength: 3
+          enum: ['0','1','2','3','4','5','6','7','8','9','9A','10','10A','11','11A']
+          description: 'Annex type identifier'
+          example: '2'
+        product:
+          type: string
+          maxLength: 3
+          enum: ["AEA","B00","DSL", "DSM","GLN","GLP","GPN", "GSL", "GSP", "OCB", "QAV", "S10"]
+          description: 'Type of fuel'
+          example: 'S10'
+        origin_state:
+          type: string
+          maxLength: 2
+          description: 'State of the company of origin.'
+          example: 'PB'
+        cnpj_supplier:
+          type: string
+          readOnly: true
+          maxLength: 14
+          description: 'CNPJ of the supplier.'
+          example: '26090286000137'
+        ie_supplier:
+          type: string
+          maxLength: 14
+          description: 'Supplier state registration.'
+          example: '016122778'
+        destination_state:
+          type: string
+          maxLength: 2
+          description: 'State of destination.'
+          example: 'PB'
+        others_state:
+          type: string
+          maxLength: 2
+          description: "Other UF's."
+          example: 'PB'
+        cnpj:
+          type: string
+          maxLength: 14
+          description: 'Cnpj of the recipient company.'
+          example: '26090286000137'
+        ie:
+          type: string
+          maxLength: 14
+          description: 'State registration of the recipient company.'
+          example: '016122778'
+        iest:
+          type: string
+          maxLength: 14
+          description: 'IEST of the recipient company.'
+          example: '016122778'
+        corporate_name:
+          type: string
+          maxLength: 60
+          description: 'Business name of the recipient of the transaction.'
+          example: 'Distribuidora de Combustíveis S/A'
+        address:
+          type: string
+          maxLength: 60
+          description: 'Address of the recipient of the transaction.'
+          example: 'Rua do Comercio SN'
+        district:
+          type: string
+          maxLength: 30
+          description: 'Neighborhood of the recipient of the operation.'
+          example: 'Centro'
+        county:
+          type: string
+          maxLength: 40
+          description: 'Municipality of the recipient of the operation.'
+          example: 'Campina Grande'
+        state:
+          type: string
+          readOnly: true
+          maxLength: 2
+          description: 'State of the recipient of the transaction'
+          example: 'PB'
+        zip_code:
+          type: string
+          maxLength: 8
+          description: 'Zip code of the recipient of the transaction.'
+          example: '58414040'
+        email:
+          type: string
+          maxLength: 60
+          description: 'Responsible contact email'
+          example: 'contact@mail.com'
+        category:
+          type: string
+          maxLength: 3
+          description: 'Issuer category'
+          enum: ['DIS','IMP','REF','TRR']
+          example: 'DIS'
+        phone:
+          type: string
+          maxLength: 12
+          description: 'Responsible contact phone number'
+          example: '01131776355'
+        contact:
+          type: string
+          maxLength: 40
+          description: 'Name of responsible'
+          example: 'João Alberto'
+        contact_position:
+          type: string
+          maxLength: 40
+          description: 'Responsible position'
+          example: 'DIRETOR ADMINISTRATIVO'
+        contact_cpf:
+          type: string
+          maxLength: 11
+          description: 'CPF of the responsible'
+          example: '92760472043'
+        contact_rg:
+          type: string
+          maxLength: 14
+          description: 'RG of the responsible'
+          example: '479615809'
+        contact_state:
+          type: string
+          readOnly: true
+          maxLength: 2
+          description: 'State of RG of the responsible'
+          example: 'PB'
+        local:
+          type: string
+          maxLength: 40
+          description: 'City of the issuer of the annex'
+          example: 'Campina Grande'
+        date:
+          type: string
+          format: date
+          description: 'Annex issue date'
+          example: '2020-01-01'
+        hour:
+          type: string
+          maxLength: 8
+          description: 'Annex issue time'
+          example: '11:45:15'
+        annex_origin:
+          type: string
+          maxLength: 1
+          description: ''
+          example: ''
+
+    MultiStatus:
+      type: object
+      description: Default template for message when a request returns multiple status.
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: array
+          description: All items that were processed successfully.
+          items:
+            type: object
+            description: Item data processed.
+            oneOf:
+              - $ref: '#/components/schemas/Header'
+              - $ref: '#/components/schemas/A2q2d'
+              - $ref: '#/components/schemas/A2q2h'
+              - $ref: '#/components/schemas/A4q2d'
+              - $ref: '#/components/schemas/A4q2h'
+              - $ref: '#/components/schemas/Nfe'
+        error:
+          type: array
+          description: All items that were were not processed due to some error.
+          items:
+            type: object
+            description: Item data not processed.
+            properties:
+              code:
+                type: integer
+                description: The requisition status code for the item.
+              message:
+                type: string
+                description: Readable and short description of the error.
+              description:
+                type: string
+                description: Detailed description of the error.
+              item:
+                type: object
+                description: Item data that was not successfully processed
+                oneOf:
+                  - $ref: '#/components/schemas/Header'
+                  - $ref: '#/components/schemas/A2q2d'
+                  - $ref: '#/components/schemas/A2q2h'
+                  - $ref: '#/components/schemas/A4q2d'
+                  - $ref: '#/components/schemas/A4q2h'
+                  - $ref: '#/components/schemas/Nfe'
+
+    MonthlySummaryItem:
+      type: object
+      description: 'Data model used in the annual summary resulting from annexes'
+      properties:
+        aliquot:
+          type: number
+          example: 4.4955
+        amount:
+          type: number
+          example: 4000
+        bcst:
+          type: number
+          example: 17982
+        consumer_product:
+          type: number
+          example: 4000
+        icms_st:
+          type: number
+          example: 4.4955
+        nfe_number:
+          type: string
+          example: '4859415'
+        pmpf:
+          type: number
+          example: 4.4955
+
+    Nfe:
+      type: object
+      description: 'Data model used in electronic invoices'
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        passkey_number:
+          type: string
+          maxLength: 44
+          description: 'Invoice access key'
+          example: '25210101241994000958550030000941441412662348'
+        electronic_invoice_number:
+          type: string
+          maxLength: 6
+          description: 'Invoice number'
+          example: '160012'
+        issue_date_time:
+          type: string
+          format: data-time
+          description: 'Date and time of invoice issuance.'
+          example: '2021-09-29T12:33:07.000Z'
+        issuer_corporate_name:
+          type: string
+          description: ''
+          example: 'Distribuidora de Combustíveis S/A'
+        issuer_cnpj:
+          type: string
+          description: ''
+          example: '41080722000180'
+        issuer_state:
+          type: string
+          description: ''
+          example: 'PB'
+        recipient_corporate_name:
+          type: string
+          description: ''
+          example: 'Distribuidora de Combustíveis S/A'
+        recipient_cnpj:
+          type: string
+          description: ''
+          example: '41080722000180'
+        recipient_state:
+          type: string
+          description: ''
+          example: 'PB'
+        product_code:
+          type: string
+          description: 'Invoice product code.'
+          example: '1000001'
+        product_description:
+          type: string
+          description: 'Product description of the invoice.'
+          example: 'GASOLINA C ADITIVADA'
+        ncm_code:
+          type: string
+          description: 'Mercosur Common Nomenclature Code - NCM'
+          example: '27101259'
+        anp_code:
+          type: string
+          description: ''
+          example: '27101259'
+        cst:
+          type: string
+          description: ''
+          example: '27101259'
+        cfop:
+          type: string
+          description: ''
+          example: '27101259'
+        product_quantity:
+          type: number
+          description: 'Total amount of invoice product.'
+          example: 3000
+        unitary_value:
+          type: number
+          description: ''
+          example: 2.82
+        product_value:
+          type: number
+          description: ''
+          example: 124164.96
+        total_note_value:
+          type: number
+          description: 'Total invoice amount.'
+          example: 9765.68
+
+        date_time_inclusion:
+          type: string
+          format: data-time
+          description: 'Invoice inclusion date and time.'
+          example: '2021-09-29T12:33:07.000Z'
+        date_time_receipt:
+          type: string
+          format: data-time
+          description: 'Date and time of receipt of invoice.'
+          example: '2021-09-29T12:33:07.000Z'
+        date_time_operation:
+          type: string
+          format: data-time
+          description: 'Invoice operation date and time.'
+          example: '2021-09-29T12:33:07.000Z'
+
+        operatoin_description:
+          type: string
+          description: 'Description of the invoice operation.'
+          example: 'Venda combust/lubrif adquir ou rec terc dest comercialização'
+        bc_value:
+          type: number
+          description: 'Value of the tax base of the invoice product.'
+          example: 9765.68
+        icms_bc_value:
+          type: number
+          description: 'Value of the ICMS tax base resulting from the invoice.'
+          example: 9765.68
+        icms_st_bc_value:
+          type: number
+          description: 'Value of the calculation base of ICMS tax substitution resulting from the invoice.'
+          example: 9765.68
+
+        st_bc_value_held_dest:
+          type: number
+          description: ''
+          example: 224777.50
+        icms_st_bc_value_held_dest:
+          type: number
+          description: ''
+          example: 6518.48
+
+    Pmpf:
+      type: object
+      description: 'Data model used by weighted average price to the final consumer. (Refers to SCANC GST table TBPRSEF)'
+      required:
+        - standard
+        - num
+        - year
+        - state
+        - start_date
+        - end_date
+        - product
+        - value
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        standard:
+          type: string
+          maxLength: 10
+          description: 'Legislative norm that amends the pmpf'
+          example: 'ATO COTEPE'
+        num:
+          type: string
+          maxLength: 5
+          description: 'Number of the legislative norm that changes the pmpf'
+          example: '8'
+        year:
+          type: string
+          maxLength: 4
+          description: 'Year of publication of the standard'
+          example: '2021'
+        state:
+          type: string
+          maxLength: 2
+          description: 'Identification of the UF (state) in which the standard is in force'
+          example: 'PB'
+        start_date:
+          type: string
+          format: date-time
+          description: 'Standard effective date'
+          example: '2021-01-01'
+        end_date:
+          type: string
+          format: date-time
+          description: 'Standard end of validity date'
+          example: '2021-01-31'
+        product:
+          type: string
+          maxLength: 5
+          description: 'Product Identification'
+          enum: ["AEHC","DSL", "DSM", "GLP","GPN", "GSL", "GSP", "OCB", "P13", "QAV", "S10"]
+          example: 'GSL'
+        value:
+          type: number
+          description: 'Pmpf value'
+          example: 7.1203
+
+    Product:
+      type: object
+      description: 'Data model used to represent SCANC products.
+      (Refers to SCANC GST table TBPRSEF)'
+      required:
+        - product
+        - description
+        - unity
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+          description: Automatically generated key field.
+          example: '5c86d00c7a8618923481b48b'
+        created_at:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Date automatically generated in UTC format according to ISO 8601 at the time the user is saved.
+          example: "2020-08-18T09:52:30Z"
+        product:
+          type: string
+          maxLength: 5
+          description: 'Product identification code'
+          example: '64483'
+        description:
+          type: string
+          maxLength: 60
+          description: 'Product description'
+          example: 'BXD - ÓLEO DIESEL B S10 COMUM'
+        unity:
+          type: string
+          maxLength: 3
+          description: 'Product unit of measure'
+          example: 'L'
+
+  parameters:
+    fieldsParam:
+      in: query
+      name: fields
+      required: false
+      description: >-
+        Allows you to retrieve only the information you want. To do this,
+        simply provide the name of the attributes separated by commas.
+        For example: **_fields=field1,field2_** indicates that only
+        field1 and field2 should be listed in the query result.
+      schema:
+        type: array
+        items:
+          type: string
+    pageParam:
+      in: query
+      name: page
+      required: false
+      description: The page number.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      description: The number of items to return.
+      schema:
+        type: integer
+        format: int32
+        maximum: 100
+        default: 20
+    sortParam:
+      in: query
+      name: sort
+      required: false
+      description: >-
+        Contains the names of the attributes, separated by commas, that
+        will be used to sort the result of the query. For ascending sort,
+        use the '+' character before the attribute name. For descending
+        sort, use the '-' character before the attribute name. By default,
+        the order is ascending, so the '+' symbol is optional, just enter
+        the attribute.
+      schema:
+        type: array
+        items:
+          type: string
+        default:
+          - created_at
+    filterParam:
+      in: query
+      name: filter
+      schema:
+        type: object
+      style: form
+      explode: true
+      description: >-
+        To filter a collection by multiple concurrent attributes or filter
+        multiple values for an attribute, simply use the attribute/property
+        name with an equal sign and the expected values (separated by a comma). **_property=value1,value2,value3_**. The query is not case sensitive.
+        Example: **_?type=direct_administration_** to retrieve exactly the items with direct_administration type.
+        For filtering with logical operators, just follow the syntax:
+        **_property=operator:value_**. The available operators are:
+         - **gt** -> Defines the value of the attribute is greater than
+                    (that is, >) the specified value.
+         - **gte** -> Defines the attribute value is greater than or equal to
+                    (that is, >=) the specified value.
+         - **lt** -> Define the value of the attribute to be less than (that is, <)
+                    the specified value.
+         - **lte** -> Defines the value of the attribute is less than or equal to
+                    (that is, <=) the specified value.
+
+        Example: **_?value=gte:800&value=lt:1200_** to recover the items with value greater than or equal to 800 and less then 1200.
+    dateStartParam:
+      in: query
+      name: date_start
+      required: false
+      description: >-
+        Define start date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss. The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+    dateEndParam:
+      in: query
+      name: date_end
+      required: false
+      description: >-
+        Define end date in format: YYYY-MM-DD ou YYYY-MM-DD hh:mm:ss.The
+        attribute used for the query will be the registration_date.
+      schema:
+        type: string
+        default: today
+    periodParam:
+      in: query
+      name: period
+      required: false
+      description: |-
+        Sets the period from the available ones:
+         - **[1..n]d** - Total days (1d, 2d, ...)
+         - **[1..n]w** - Total of weeks (1w, 2w, ...)
+         - **[1..n]m** - Total of months (1m, 2m, ...)
+         - **[1..n]y** - Total of years (1y, 2y, ...)
+        The attribute used for the query will be the registration_date.
+      schema:
+        type: string
+
+  responses:
+    204:
+      description: >-
+        Operation performed successfully. There is no data to be returned
+    400:
+      description: >-
+        Request can not be met, syntactically incorrect or violates the
+        schema. Normally it occurs due to validation issues, such as fields
+        that are expected in the request body and not passed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    401:
+      description: >-
+        Authentication failed due to invalid authentication credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    403:
+      description: >-
+        User does not have scope to access this resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    404:
+      description: >-
+        Specified resource does not exist. Usually when the URI is incorrect
+        or the resource is not found, or even no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    406:
+      description: >-
+        The server is not implementing the media type requested by the
+        client for the application response. Only application/json is
+        currently accepted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    409:
+      description: >-
+        Conflicts have probably occurred with data that can not be duplicated.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    415:
+      description: >-
+        The server does not support the requested payload format. Only
+        application/json is accepted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    429:
+      description: >-
+        The rate limit for requests exceeded.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    500:
+      description: >-
+        An internal server error occurred. Although the client appears to
+        provide a correct request, the server encountered an unexpected
+        condition that prevented it from responding to the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
