@@ -12,12 +12,15 @@ import { SendFile } from '../domain/model/send.file'
 import { DeleteFiles } from '../domain/model/delete.files'
 import { IntegrationEventRepository } from '../../infrastructure/repository/integration.event.repository'
 import { DeleteSyncEvent } from '../integration-event/event/delete.sync.event'
+import { IFileRepository } from '../port/file.repository.interface'
+import { File } from '../domain/model/file'
 
 @injectable()
 export class DirectoryService implements IDirectoryService {
 
     constructor(
         @inject(Identifier.DIRECTORY_REPOSITORY) private readonly _repository: IDirectoryRepository,
+        @inject(Identifier.FILE_REPOSITORY) private readonly _fRepository: IFileRepository,
         @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepositoy: IntegrationEventRepository,
     ) {
     }
@@ -91,13 +94,45 @@ export class DirectoryService implements IDirectoryService {
         }
     }
 
-    public getAll(query: IQuery): Promise<Array<Directory>> {
-        return this._repository.find(query)
+    public async getAll(query: IQuery): Promise<Array<Directory>> {
+        const result = await this._repository.find(query)
+        const directorys: Array<Directory> = []
+        for (const directory of result) {
+            const files: Array<File> = []
+            const file: Array<any> = await this._fRepository.findByDirectory(directory.id as string)
+            for (const fl of file) {
+                const fil = new File().fromJSON({
+                    file_id: fl._id,
+                    file_name: fl.filename
+                })
+                files.push(fil)
+            }
+            const direct = new Directory().fromJSON({
+                ...directory.toJSON(),
+            })
+            direct.files = files
+            directorys.push(direct)
+        }
+        return directorys
     }
 
-    public getById(id: string, query: IQuery): Promise<Directory | undefined> {
+    public async getById(id: string, query: IQuery): Promise<Directory | undefined> {
         query.addFilter({ _id: id })
-        return this._repository.findOne(query)
+        const result = await this._repository.findOne(query)
+        const directory = new Directory().fromJSON({
+            ...result?.toJSON()
+        })
+        const files: Array<File> = []
+        const file: Array<any> = await this._fRepository.findByDirectory(result?.id as string)
+        for (const fl of file) {
+            const fil = new File().fromJSON({
+                file_id: fl._id,
+                file_name: fl.filename
+            })
+            files.push(fil)
+        }
+        directory.files = files
+        return directory
     }
 
     public remove(id: string): Promise<boolean> {

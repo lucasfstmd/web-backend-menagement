@@ -8,6 +8,12 @@
  * @abstract
  */
 export abstract class Strings {
+    public static readonly OBJETO_ARQUIVO_INVALIDO = 'Objeto de arquivo inválido'
+    public static readonly NAO_FOI_POSSIVEL_GRAVAR = 'Não foi possível gravar o arquivo no banco de dados'
+    public static readonly ID_INVALIDO = 'ID inválido'
+    public static readonly NENHUM_ARQUIVO_ENCONTRADO = 'Nenhum arquivo encontrado com este id'
+
+
     public static readonly APP: any = {
         TITLE: 'DATA CROSS API',
         APP_DESCRIPTION: 'Service responsible for performing the data management.'

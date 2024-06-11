@@ -8,13 +8,16 @@ export abstract class Identifier {
 
     // Controllers
     public static readonly DIRECTORY_CONTROLLER: any = Symbol.for('DirectoryController')
+    public static readonly FILE_CONTROLLER: any = Symbol.for('FileController')
 
     // Services
     public static readonly DIRECTORY_SERVICE: any = Symbol.for('DirectoryService')
+    public static readonly FILE_SERVICE: any = Symbol.for('FileService')
 
     // Repositories
     public static readonly INTEGRATION_EVENT_REPOSITORY: any = Symbol.for('IntegrationEventRepository')
     public static readonly DIRECTORY_REPOSITORY: any = Symbol.for('DirectoryRepository')
+    public static readonly FILE_REPOSITORY: any = Symbol.for('FileRepository')
 
     // Models
     public static readonly INTEGRATION_EVENT_REPO_MODEL: any = Symbol.for('IntegrationEventRepoModel')

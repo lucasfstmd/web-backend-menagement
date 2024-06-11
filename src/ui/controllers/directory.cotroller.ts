@@ -1,4 +1,4 @@
-import { controller, httpDelete, httpPost, httpPut, request, response } from 'inversify-express-utils'
+import { controller, httpDelete, httpGet, httpPost, httpPut, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { inject } from 'inversify'
@@ -6,6 +6,7 @@ import { Identifier } from '../../di/identifiers'
 import { IDirectoryService } from '../../application/port/directory.service.interface'
 import HttpStatus from 'http-status-codes'
 import { Directory } from '../../application/domain/model/directory'
+import { Query } from '../../infrastructure/repository/query/query'
 
 @controller('/v1/directory')
 export class DirectoryCotroller {
@@ -52,6 +53,21 @@ export class DirectoryCotroller {
             const { directory_id } = req.params
             const result = await this._service.deleteDirectory(directory_id)
 
+            return res.status(HttpStatus.OK).send(result)
+        } catch (err) {
+            return DirectoryCotroller.handlerError(res, err)
+        }
+    }
+
+    @httpGet('/:directory_id')
+    public async getDirectorys(@request() req: Request, @response() res: Response): Promise<Response> {
+        try {
+            const { directory_id } = req.params
+            const query = new Query()
+            query.addFilter({
+                directory: directory_id
+            })
+            const result = await this._service.getAll(query)
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {
             return DirectoryCotroller.handlerError(res, err)

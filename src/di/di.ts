@@ -31,6 +31,11 @@ import { IDirectoryService } from '../application/port/directory.service.interfa
 import { DirectoryService } from '../application/service/directory.service'
 import { SubscribeEventBusTask } from '../background/task/subscribe.event.bus.task'
 import { RpcServerEventBusTask } from '../background/task/rpc.server.event.bus.task'
+import { FileController } from '../ui/controllers/file.controller'
+import { FileRepository } from '../infrastructure/repository/file.repository'
+import { IFileRepository } from '../application/port/file.repository.interface'
+import { FileService } from '../application/service/file.service'
+import { IFileService } from '../application/port/file.service.interface'
 
 class IoC {
     private readonly _container: Container
@@ -66,11 +71,17 @@ class IoC {
         this._container
             .bind<DirectoryCotroller>(Identifier.DIRECTORY_CONTROLLER)
             .to(DirectoryCotroller).inSingletonScope()
+        this._container
+            .bind<FileController>(Identifier.FILE_CONTROLLER)
+            .to(FileController).inSingletonScope()
 
         // Service
         this._container
             .bind<IDirectoryService>(Identifier.DIRECTORY_SERVICE)
             .to(DirectoryService).inSingletonScope()
+        this._container
+            .bind<IFileService>(Identifier.FILE_SERVICE)
+            .to(FileService).inSingletonScope()
 
         // Repository
         this._container
@@ -79,6 +90,9 @@ class IoC {
         this._container
             .bind<IDirectoryRepository>(Identifier.DIRECTORY_REPOSITORY)
             .to(DirectoryRepository).inSingletonScope()
+        this._container
+            .bind<IFileRepository>(Identifier.FILE_REPOSITORY)
+            .to(FileRepository).inSingletonScope()
 
         // Models
         this._container.bind(Identifier.INTEGRATION_EVENT_REPO_MODEL).toConstantValue(IntegrationEventRepoModel)
