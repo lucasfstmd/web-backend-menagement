@@ -23,7 +23,7 @@ export class FileRepository implements IFileRepository {
     constructor(
         @inject(Identifier.MONGODB_CONNECTION) private readonly _connection: IConnectionDB,
     ) {
-        this._filePaths =  __dirname + '/temp-files'
+        this._filePaths =  'C:/Users/NUTES/WebstormProjects/caderneta/web-backend-menagement/temp-files'
         if (!existsSync(this._filePaths)) {
             mkdirSync(this._filePaths)
         }
