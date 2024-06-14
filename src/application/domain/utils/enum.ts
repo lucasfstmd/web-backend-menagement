@@ -1,5 +1,6 @@
 export enum TypeDrive {
     ROOT = 'root',
     FILE = 'file',
-    DIRECTORY = 'directory'
+    DIRECTORY = 'directory',
+    TRASH = 'trash'
 }

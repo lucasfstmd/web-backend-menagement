@@ -1,7 +1,7 @@
 import { inject } from 'inversify'
 import { Identifier } from '../../di/identifiers'
 import { IFileService } from '../../application/port/file.service.interface'
-import { controller, httpGet, httpPost, request, response } from 'inversify-express-utils'
+import { controller, httpDelete, httpGet, httpPost, request, response } from 'inversify-express-utils'
 import { Request, Response } from 'express'
 import HttpStatus from 'http-status-codes'
 import { unlinkSync } from 'fs'
@@ -86,6 +86,17 @@ export class FileController {
         try {
             const { directory_id } = req.params
             const file = await this._service.findByDirectory(directory_id)
+            return res.status(HttpStatus.OK).send(file)
+        } catch (err) {
+            return FileController.handlerError(res, err)
+        }
+    }
+
+    @httpDelete('/:file_id')
+    public async deleteFile(@request() req: Request, @response() res: Response): Promise<Response> {
+        try {
+            const { file_id } = req.params
+            const file = await this._service.remove(file_id)
             return res.status(HttpStatus.OK).send(file)
         } catch (err) {
             return FileController.handlerError(res, err)

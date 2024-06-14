@@ -4,19 +4,13 @@ import { Identifier } from '../../di/identifiers'
 import { IFileRepository } from '../port/file.repository.interface'
 import { ILogger } from '../../utils/custom.logger'
 import { IQuery } from '../port/query.interface'
-import { SendFile } from '../domain/model/send.file'
 import { File } from '../domain/model/file'
-import { IntegrationEventRepository } from '../../infrastructure/repository/integration.event.repository'
-import { FileSyncEvent } from '../integration-event/event/file.sync.event'
-import { DeleteFiles } from '../domain/model/delete.files'
-
 
 @injectable()
 export class FileService implements IFileService {
 
     constructor(
         @inject(Identifier.FILE_REPOSITORY) private readonly _fileRepository: IFileRepository,
-        @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepositoy: IntegrationEventRepository,
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
     }
@@ -45,7 +39,7 @@ export class FileService implements IFileService {
                     })
                     resolve(files)
                 }).catch(err => {
-                    reject(err)
+                reject(err)
             })
         })
     }
@@ -60,19 +54,10 @@ export class FileService implements IFileService {
         }
     }
 
+
     public getAll(query: IQuery): Promise<Array<any>> {
         try {
             const result = this._fileRepository.find(query)
-            return Promise.resolve(result)
-        } catch (err) {
-            this._logger.error(`Error: ${err}`)
-            return Promise.reject(err)
-        }
-    }
-
-    public async sendFiles(sendFile: SendFile): Promise<any> {
-        try {
-            const result = await this._integrationEventRepositoy.publishEvent(new FileSyncEvent(new Date(), sendFile))
             return Promise.resolve(result)
         } catch (err) {
             this._logger.error(`Error: ${err}`)
@@ -84,8 +69,15 @@ export class FileService implements IFileService {
         return Promise.resolve(undefined)
     }
 
-    public remove(id: string | number): Promise<boolean> {
-        return Promise.resolve(false)
+    public async remove(id: string): Promise<boolean> {
+        try {
+            const result = this._fileRepository.delete(id)
+            console.log(result)
+            return Promise.resolve(result)
+        } catch (err) {
+            this._logger.error(`Error: ${err}`)
+            return Promise.reject(err)
+        }
     }
 
     public update(item: any): Promise<any> {
@@ -96,17 +88,15 @@ export class FileService implements IFileService {
         return Promise.resolve(0)
     }
 
-    public async deleteFiles(files: DeleteFiles): Promise<void> {
+    public async deleteFiles(directory_id: string): Promise<void> {
         try {
-            if (files.files_ids instanceof Array) {
-                for (const file of files.files_ids) {
-                    await this._fileRepository.delete(file)
-                }
+            const files = await this._fileRepository.findByDirectory(directory_id)
+            for (const file of files) {
+                await this._fileRepository.delete(file._id)
             }
-            return Promise.resolve()
         } catch (err) {
-        this._logger.error(`Error: ${err}`)
-        return Promise.reject(err)
-    }
+            this._logger.error(`Error: ${err}`)
+            return Promise.reject(err)
+        }
     }
 }

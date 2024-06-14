@@ -47,11 +47,11 @@ export class DirectoryCotroller {
         }
     }
 
-    @httpDelete('/delete/folder/:directory_id')
+    @httpDelete('/:directory_id')
     public async deleteFolder(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const { directory_id } = req.params
-            const result = await this._service.deleteDirectory(directory_id)
+            const result = await this._service.remove(directory_id)
 
             return res.status(HttpStatus.OK).send(result)
         } catch (err) {

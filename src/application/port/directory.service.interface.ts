@@ -7,7 +7,5 @@ export interface IDirectoryService extends IService<Directory> {
 
     updateFolder(item: Directory): Promise<Directory | undefined>
 
-    deleteDirectory(directory_id: string): Promise<boolean>
-
     uploadFiles(files: SendFile): Promise<Directory | undefined>
 }

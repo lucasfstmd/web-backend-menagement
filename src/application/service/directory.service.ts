@@ -9,9 +9,6 @@ import { Strings } from '../../utils/strings'
 import { Query } from '../../infrastructure/repository/query/query'
 import { TypeDrive } from '../domain/utils/enum'
 import { SendFile } from '../domain/model/send.file'
-import { DeleteFiles } from '../domain/model/delete.files'
-import { IntegrationEventRepository } from '../../infrastructure/repository/integration.event.repository'
-import { DeleteSyncEvent } from '../integration-event/event/delete.sync.event'
 import { IFileRepository } from '../port/file.repository.interface'
 import { File } from '../domain/model/file'
 
@@ -21,7 +18,6 @@ export class DirectoryService implements IDirectoryService {
     constructor(
         @inject(Identifier.DIRECTORY_REPOSITORY) private readonly _repository: IDirectoryRepository,
         @inject(Identifier.FILE_REPOSITORY) private readonly _fRepository: IFileRepository,
-        @inject(Identifier.INTEGRATION_EVENT_REPOSITORY) private readonly _integrationEventRepositoy: IntegrationEventRepository,
     ) {
     }
 
@@ -71,29 +67,6 @@ export class DirectoryService implements IDirectoryService {
         }
     }
 
-    public async deleteDirectory(directory_id: string): Promise<boolean> {
-        try {
-            const directory = await this._repository.findOne(new Query().fromJSON({
-                _id: directory_id
-            }))
-
-            const file: DeleteFiles = new DeleteFiles()
-
-            if (directory?.files instanceof Array) {
-                for (const fl of directory?.files) {
-                    file.files_ids?.push(`${fl.file_id}`)
-                }
-
-                await this._integrationEventRepositoy.publishEvent(new DeleteSyncEvent(new Date(), file))
-                await this.remove(directory_id)
-            }
-
-            return Promise.resolve(true)
-        } catch (err) {
-            return Promise.reject(err)
-        }
-    }
-
     public async getAll(query: IQuery): Promise<Array<Directory>> {
         const result = await this._repository.find(query)
         const directorys: Array<Directory> = []
@@ -136,7 +109,14 @@ export class DirectoryService implements IDirectoryService {
     }
 
     public remove(id: string): Promise<boolean> {
-        return this._repository.delete(id)
+        try {
+            this._fRepository.downloadFile(id)
+            this._repository.delete(id)
+
+            return Promise.resolve(true)
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     public update(item: Directory): Promise<Directory | undefined> {

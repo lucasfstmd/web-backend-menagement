@@ -62,6 +62,16 @@ export class BackgroundService {
                 this._logger.info(`Root Direcotory created: ${res?.id}`)
             ).catch(err => this._logger.warn(`Error in created root default directory: ${err}`))
 
+        const defaultTrash: Directory = new Directory().fromJSON({
+            type: TypeDrive.TRASH,
+            name: 'trash',
+        })
+
+        this._directoryService.add(defaultTrash)
+            .then((res) =>
+                this._logger.info(`Trash Direcotory created: ${res?.id}`)
+            ).catch(err => this._logger.warn(`Error in created root default directory: ${err}`))
+
         this._eventBus
             .connectionPub
             .open(rabbitConfigs.uri, rabbitConfigs.options)

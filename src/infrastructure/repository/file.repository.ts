@@ -125,7 +125,7 @@ export class FileRepository implements IFileRepository {
 
     public delete(id: string | number): Promise<boolean> {
         try {
-            this._initializeBucket().delete(new ObjectId(id))
+            this._initializeBucket().delete(ObjectId('666b75584f0ef94170e6b29d'))
             return Promise.resolve(true)
         } catch (err) {
             return Promise.reject(err)
