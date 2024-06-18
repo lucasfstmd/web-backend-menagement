@@ -7,6 +7,8 @@ export interface IDBOptions {
     tlsCAFile: any
     tlsCertificateKeyFile: any
     tlsCertificateFile: any
+    useUnifiedTopology: boolean
+    executeLegacyOperation: boolean
 }
 
 export interface IEventBusOptions {

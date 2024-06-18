@@ -23,7 +23,9 @@ export abstract class Config {
             options: (process.env.MONGODB_ENABLE_TLS === 'true') ? {
                 tlsAllowInvalidCertificates: false,
                 tlsCAFile: process.env.MONGODB_CA_PATH,
-                tlsCertificateKeyFile: process.env.MONGODB_KEY_PATH
+                tlsCertificateKeyFile: process.env.MONGODB_KEY_PATH,
+                useUnifiedTopology: true,
+                executeLegacyOperation: true
             } as IDBOptions : undefined
         } as IMongoConfig
     }
